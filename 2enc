@@ -1,0 +1,51 @@
+#!/bin/bash
+
+usage(){
+	echo "$(tput bold ; tput setaf 6) Usage $0 [number of loop] '[string]'"
+	echo "If spaces in string protect it with quotes"
+	echo "Warning big data after loop 5$(tput sgr0)"
+	exit
+}
+
+footer(){
+        echo -e "\n$(tput setaf 6) CykloDev $(tput setaf 7)pl$(tput setaf 2)3$(tput setaf 7)dg$(tput setaf 2)3$(tput setaf 7) th$(tput setaf 2)3 3$(tput setaf 7)dg$(tput setaf 2)3 \n" 
+}
+
+if [[ -z ${1} ]] || [[ -z ${2} ]] 
+then
+	usage
+fi
+
+
+
+
+function enc(){
+	hex_val=`echo -n "$data" | xxd -ps | sed 's/[[:xdigit:]]\{2\}/\\x&/g'`;
+	#echo -ne "-->   $hex_val";
+	#echo "";
+	base64_val=`printf %s $hex_val | base64 | sed 's/=//g'`;
+	#echo -ne "-->   ";
+	#printf %s  $base64_val;
+	#echo "";
+	compress=`printf %s $base64_val |  gzip -cf | base64 | sed 's/=//g'`;
+	#echo -ne "-->   ";
+        #printf %s  $compress;
+        #echo "";
+	data=$compress
+}
+
+data=$2
+loop=$1
+
+count=0;
+while [[ $count -lt $loop  ]]
+do
+	echo "$(tput setaf 1)### Loop $count $(tput setaf 4)"
+	enc "$data";
+	printf %s $data
+	echo "$(tput sgr0)"
+	((count++))
+done
+
+
+footer
